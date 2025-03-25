@@ -8,4 +8,5 @@
     public string Nic { get; set; }
     public string Password { get; set; }
     public string Profile { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
