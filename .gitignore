@@ -365,3 +365,4 @@ FodyWeavers.xsd
 .idea/.idea.zenra-finance-back/.idea/workspace.xml
 .gitignore
 .idea/.idea.zenra-finance-back/.idea/projectSettingsUpdater.xml
+.DS_Store
