@@ -17,7 +17,6 @@ namespace zenra_finance_back.Services
 
         public async Task<Response<User>> Register(User user)
         {
-            user.CreatedAt = DateTime.Now; // Use of DateTime.UtcNow is recommended for consistency across time zones
             try
             {
                 await _context.Users.AddAsync(user);
