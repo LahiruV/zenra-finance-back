@@ -1,0 +1,6 @@
+@zenra_finance_back_HostAddress = http://localhost:5073
+
+GET {{zenra_finance_back_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
