@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /zenra-finance-back/appsettings.json
+.idea/.idea.zenra-finance-back/.idea/workspace.xml
+.gitignore
+.idea/.idea.zenra-finance-back/.idea/projectSettingsUpdater.xml
