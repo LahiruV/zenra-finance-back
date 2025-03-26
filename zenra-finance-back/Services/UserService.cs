@@ -15,12 +15,10 @@ namespace zenra_finance_back.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
-        private readonly ITokenService _tokenService;
 
-        public UserService(AppDbContext context, ITokenService tokenService)
+        public UserService(AppDbContext context)
         {
             _context = context;
-            _tokenService = tokenService;
         }
 
         public async Task<Response<User>> Register(User user)
@@ -44,6 +42,7 @@ namespace zenra_finance_back.Services
         {
             try
             {
+                TokenService tokenService = new TokenService();
                 var user = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == loginRequest.Email);
 
@@ -59,7 +58,7 @@ namespace zenra_finance_back.Services
                 }
 
                 // Generate JWT token
-                var token = await _tokenService.GenerateToken(user);
+                var token = await tokenService.GenerateToken(user);
 
                 return Response<string>.Success(token, "Login successful");
             }

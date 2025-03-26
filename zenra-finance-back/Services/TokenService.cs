@@ -10,14 +10,14 @@ using zenra_finance_back.Services.IServices;
 
 namespace zenra_finance_back.Services
 {
-    public class TokenService : ITokenService
+    public class TokenService
     {
         public async Task<string> GenerateToken(User user)
         {
             return await Task.FromResult(GenerateJwtToken(user));
         }
 
-        public string GenerateJwtToken(User user)
+        private string GenerateJwtToken(User user)
         {
             var claims = new[]
             {
