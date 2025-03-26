@@ -28,5 +28,21 @@ namespace zenra_finance_back.Controllers
             }
             return BadRequest("Some properties are not valid");
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
+        {
+            if (ModelState.IsValid)
+            {
+                var response = await _service.Login(loginRequest);
+                if (response.IsSuccess)
+                {
+                    return Ok(response);  // Return token or success message
+                }
+                return BadRequest(response);  // Return failure message
+            }
+            return BadRequest("Invalid login request.");
+        }
+
     }
 }

@@ -6,5 +6,6 @@ namespace zenra_finance_back.Services.IServices
     public interface IUserService
     {
         Task<Response<User>> Register(User user);
+        Task<Response<string>> Login(LoginRequest loginRequest);
     }
 }
