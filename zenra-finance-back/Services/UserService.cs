@@ -67,6 +67,32 @@ namespace zenra_finance_back.Services
                 return Response<string>.Failure("Login failed. Please try again.", ex.ToString());
             }
         }
+
+        public async Task<Response<User>> GetUserInfo(int userId)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .Where(u => u.Id == userId)
+                    .Select(u => new User
+                    {
+                        Email = u.Email,
+                        Name = u.Name,
+                        Profile = u.Profile,
+                    })
+                    .FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    return Response<User>.Failure("User not found.");
+                }
+
+                return Response<User>.Success(user, "User found");
+            }
+            catch (Exception ex)
+            {
+                return Response<User>.Failure("Error retrieving user info.", ex.ToString());
+            }
+        }
     }
 
 }
