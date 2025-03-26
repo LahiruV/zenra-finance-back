@@ -15,10 +15,12 @@ namespace zenra_finance_back.Services
     public class UserService : IUserService
     {
         private readonly AppDbContext _context;
+        private readonly ITokenService _tokenService;
 
-        public UserService(AppDbContext context)
+        public UserService(AppDbContext context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
 
         public async Task<Response<User>> Register(User user)
@@ -57,7 +59,7 @@ namespace zenra_finance_back.Services
                 }
 
                 // Generate JWT token
-                var token = GenerateJwtToken(user);
+                var token = await _tokenService.GenerateToken(user);
 
                 return Response<string>.Success(token, "Login successful");
             }
@@ -65,29 +67,6 @@ namespace zenra_finance_back.Services
             {
                 return Response<string>.Failure("Login failed. Please try again.", ex.ToString());
             }
-        }
-
-        private string GenerateJwtToken(User user)
-        {
-            var claims = new[]
-            {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Name),
-            new Claim(ClaimTypes.Email, user.Email)
-        };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSuperSecretKeyThatIsAtLeast128BitsLong"));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: "zenra_pvt_ltd",
-                audience: "zenra_finance",
-                claims: claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: credentials
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 
