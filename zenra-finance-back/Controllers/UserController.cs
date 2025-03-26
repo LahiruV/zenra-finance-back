@@ -1,6 +1,8 @@
 ﻿using zenra_finance_back.Models;
 using zenra_finance_back.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace zenra_finance_back.Controllers
 {
@@ -15,7 +17,7 @@ namespace zenra_finance_back.Controllers
         }
 
         [HttpPost("Register")]
-       public async Task<IActionResult> Register([FromBody] User user)
+        public async Task<IActionResult> Register([FromBody] User user)
         {
             if (ModelState.IsValid)
             {
@@ -44,5 +46,17 @@ namespace zenra_finance_back.Controllers
             return BadRequest("Invalid login request.");
         }
 
+        // Secure endpoint with JWT authorization
+        [HttpGet("GetUserInfo")]
+        [Authorize]
+        public IActionResult GetUserInfo()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId != null)
+            {
+                return Ok(new { UserId = userId, Message = "Authenticated" });
+            }
+            return Unauthorized("User not authorized");
+        }
     }
 }

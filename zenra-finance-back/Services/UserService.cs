@@ -34,7 +34,6 @@ namespace zenra_finance_back.Services
             }
             catch (Exception ex)
             {
-                // Log the exception details here
                 return Response<User>.Failure("Registration failed. Please try again.", ex.ToString());
             }
         }
@@ -57,8 +56,8 @@ namespace zenra_finance_back.Services
                     return Response<string>.Failure("Invalid credentials.");
                 }
 
-                // Generate JWT token (Optional: implement a token service to generate the token)
-                var token = GenerateJwtToken(user); 
+                // Generate JWT token
+                var token = GenerateJwtToken(user);
 
                 return Response<string>.Success(token, "Login successful");
             }
@@ -70,15 +69,13 @@ namespace zenra_finance_back.Services
 
         private string GenerateJwtToken(User user)
         {
-            // Example token generation logic
             var claims = new[]
             {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.Name),
-        new Claim(ClaimTypes.Email, user.Email)
-    };
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.Email, user.Email)
+        };
 
-            // Use a longer, secure key for encryption (at least 128 bits or 16 characters)
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSuperSecretKeyThatIsAtLeast128BitsLong"));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -92,6 +89,6 @@ namespace zenra_finance_back.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
     }
+
 }

@@ -1,48 +1,89 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using zenra_finance_back.Data;
-using zenra_finance_back.Services;
+using System.Text;
+using Microsoft.OpenApi.Models;
 using zenra_finance_back.Services.IServices;
+using zenra_finance_back.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// Add DbContext for SQL Server
+// Add DbContext to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register the IYourEntityService and its implementation
-builder.Services.AddScoped<IYourEntityService, YourEntityService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<ICommonService, CommonService>();
-
-// Add CORS services and configure to allow all origins, headers, and methods
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
+// Add Authentication and JWT Bearer Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "zenra_pvt_ltd",
+            ValidAudience = "zenra_finance",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSuperSecretKeyThatIsAtLeast128BitsLong"))
+        };
+    });
+
+// Add Authorization services
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+});
+
+// Register other services like UserService
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Add controllers
+builder.Services.AddControllers();
+
+// Add Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        BearerFormat = "JWT",
+        Description = "Enter 'Bearer' followed by your JWT token"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
     });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Enable middleware for authentication and authorization
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Enable Swagger in Development environment
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseCors("AllowAll"); // Apply the CORS middleware using the "AllowAll" policy
-
-app.UseAuthorization();
-
+// Map controllers
 app.MapControllers();
 
 app.Run();
