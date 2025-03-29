@@ -49,14 +49,26 @@ namespace zenra_finance_back.Controllers
         // Secure endpoint with JWT authorization
         [HttpGet("GetUserInfo")]
         [Authorize]
-        public IActionResult GetUserInfo()
+        public async Task<IActionResult> GetUserInfo()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId != null)
+            if (userId == null)
             {
-                return Ok(new { UserId = userId, Message = "Authenticated" });
+                return Unauthorized("User not found.");
             }
-            return Unauthorized("User not authorized");
+            if (!int.TryParse(userId, out int userIdInt))
+            {
+                return BadRequest("Invalid user ID.");
+            }
+            var response = await _service.GetUserInfo(userIdInt);
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return BadRequest(response);
+            }
         }
     }
 }
