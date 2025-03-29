@@ -28,7 +28,7 @@ jobs:
     - name: Build Docker image
       run: |
         docker build -t your-image-name:latest .
-      
+
     # Optionally, push the Docker image to a container registry
     - name: Push Docker image to Docker Hub (or another registry)
       run: |
