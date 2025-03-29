@@ -9,6 +9,18 @@ using zenra_finance_back.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 // Add DbContext to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -72,6 +84,9 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Enable CORS
+app.UseCors("AllowAll");
+
 // Enable middleware for authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
@@ -87,3 +102,4 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.Run();
+
