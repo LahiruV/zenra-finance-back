@@ -38,7 +38,7 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<string>> Login(LoginRequest loginRequest)
+        public async Task<Response<object>> Login(LoginRequest loginRequest)
         {
             try
             {
@@ -48,23 +48,34 @@ namespace zenra_finance_back.Services
 
                 if (user == null)
                 {
-                    return Response<string>.Failure("Invalid credentials.");
+                    return Response<object>.Failure("Invalid credentials.");
                 }
 
                 // Verify password
                 if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
                 {
-                    return Response<string>.Failure("Invalid credentials.");
+                    return Response<object>.Failure("Invalid credentials.");
                 }
 
                 // Generate JWT token
                 var token = await tokenService.GenerateToken(user);
-
-                return Response<string>.Success(token, "Login successful");
+                var userDetails = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Name = user.Name,
+                    Phone = user.Phone,
+                    Address = user.Address,
+                    Nic = user.Nic,
+                    Profile = user.Profile,
+                    CreatedAt = user.CreatedAt,
+                    token = token
+                };
+                return Response<object>.Success(userDetails, "Login successful");
             }
             catch (Exception ex)
             {
-                return Response<string>.Failure("Login failed. Please try again.", ex.ToString());
+                return Response<object>.Failure("Login failed. Please try again.", ex.ToString());
             }
         }
 

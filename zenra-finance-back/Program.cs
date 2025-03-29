@@ -50,6 +50,7 @@ builder.Services.AddAuthorization(options =>
 // Register other services like UserService
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICommonService, CommonService>();
+builder.Services.AddScoped<IFinanceService, FinanceService>();
 
 // Add controllers
 builder.Services.AddControllers();

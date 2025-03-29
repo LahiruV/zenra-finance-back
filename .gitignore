@@ -366,3 +366,5 @@ FodyWeavers.xsd
 .gitignore
 .idea/.idea.zenra-finance-back/.idea/projectSettingsUpdater.xml
 .DS_Store
+.idea/.idea.zenra-finance-back/.idea/indexLayout.xml
+.idea/.idea.zenra-finance-back/.idea/vcs.xml
