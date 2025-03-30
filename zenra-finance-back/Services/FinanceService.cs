@@ -38,6 +38,13 @@ namespace zenra_finance_back.Services
             {
                 var finances = await _context.Finances
                     .OrderByDescending(f => f.Id)
+                    .Select(f => new Finance
+                    {
+                        Id = f.Id,
+                        Date = f.Date.Date, // Extract only the date part
+                        IncomeType = f.IncomeType,
+                        Amount = f.Amount
+                    })
                     .ToListAsync();
                 return Response<List<Finance>>.Success(finances, "Finances retrieved successfully");
             }
