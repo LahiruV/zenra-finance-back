@@ -14,4 +14,15 @@ namespace zenra_finance_back.Models
         public decimal Amount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
+
+    public class MonthFinanceResponse
+    {
+        public string Month { get; set; }
+        public decimal Amount { get; set; }
+    }
+    public class YearFinanceResponse
+    {
+        public string Year { get; set; }
+        public decimal Amount { get; set; }
+    }
 }

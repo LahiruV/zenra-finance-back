@@ -47,6 +47,100 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<MonthFinanceResponse>> GetThisMonthlyFinanceCount()
+        {
+            try
+            {
+                var currentMonth = DateTime.UtcNow;
+                var monthlyFinances = await _context.Finances
+                    .Where(f => f.Date.Year == currentMonth.Year && f.Date.Month == currentMonth.Month)
+                    .ToListAsync();
+
+                var totalAmount = monthlyFinances.Sum(f => f.Amount);
+                var monthName = currentMonth.ToString("MMMM");
+
+                return Response<MonthFinanceResponse>.Success(new MonthFinanceResponse
+                {
+                    Month = monthName,
+                    Amount = totalAmount
+                }, "Monthly finance count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<MonthFinanceResponse>.Failure("Failed to retrieve monthly finance count", ex.ToString());
+            }
+        }
+
+        public async Task<Response<MonthFinanceResponse>> GetLastMonthlyFinanceCount()
+        {
+            try
+            {
+                var lastMonth = DateTime.UtcNow.AddMonths(-1);
+                var monthlyFinances = await _context.Finances
+                    .Where(f => f.Date.Year == lastMonth.Year && f.Date.Month == lastMonth.Month)
+                    .ToListAsync();
+
+                var totalAmount = monthlyFinances.Sum(f => f.Amount);
+                var monthName = lastMonth.ToString("MMMM");
+
+                return Response<MonthFinanceResponse>.Success(new MonthFinanceResponse
+                {
+                    Month = monthName,
+                    Amount = totalAmount
+                }, "Monthly finance count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<MonthFinanceResponse>.Failure("Failed to retrieve monthly finance count", ex.ToString());
+            }
+        }
+
+        public async Task<Response<YearFinanceResponse>> GetThisYearFinanceCount()
+        {
+            try
+            {
+                var currentYear = DateTime.UtcNow.Year;
+                var yearlyFinances = await _context.Finances
+                    .Where(f => f.Date.Year == currentYear)
+                    .ToListAsync();
+
+                var totalAmount = yearlyFinances.Sum(f => f.Amount);
+
+                return Response<YearFinanceResponse>.Success(new YearFinanceResponse
+                {
+                    Year = currentYear.ToString(),
+                    Amount = totalAmount
+                }, "Yearly finance count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<YearFinanceResponse>.Failure("Failed to retrieve yearly finance count", ex.ToString());
+            }
+        }
+
+        public async Task<Response<YearFinanceResponse>> GetLastYearFinanceCount()
+        {
+            try
+            {
+                var lastYear = DateTime.UtcNow.AddYears(-1).Year;
+                var yearlyFinances = await _context.Finances
+                    .Where(f => f.Date.Year == lastYear)
+                    .ToListAsync();
+
+                var totalAmount = yearlyFinances.Sum(f => f.Amount);
+
+                return Response<YearFinanceResponse>.Success(new YearFinanceResponse
+                {
+                    Year = lastYear.ToString(),
+                    Amount = totalAmount
+                }, "Yearly finance count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<YearFinanceResponse>.Failure("Failed to retrieve yearly finance count", ex.ToString());
+            }
+        }
+
         public async Task<Response<Finance>> UpdateFinance(int id, Finance finance)
         {
             try

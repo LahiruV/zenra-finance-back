@@ -10,6 +10,10 @@ namespace zenra_finance_back.Services.IServices
     {
         Task<Response<Finance>> AddFinance(Finance finance);
         Task<Response<List<Finance>>> GetFinance();
+        Task<Response<MonthFinanceResponse>> GetThisMonthlyFinanceCount();
+        Task<Response<MonthFinanceResponse>> GetLastMonthlyFinanceCount();
+        Task<Response<YearFinanceResponse>> GetThisYearFinanceCount();
+        Task<Response<YearFinanceResponse>> GetLastYearFinanceCount();
         Task<Response<Finance>> UpdateFinance(int id, Finance finance);
         Task<Response<Finance>> DeleteFinance(int id);
     }

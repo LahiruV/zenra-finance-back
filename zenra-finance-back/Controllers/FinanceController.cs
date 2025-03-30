@@ -46,6 +46,50 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("GetThisMonthlyFinanceCount")]
+        public async Task<IActionResult> GetThisMonthlyFinanceCount()
+        {
+            var response = await _service.GetThisMonthlyFinanceCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetLastMonthlyFinanceCount")]
+        public async Task<IActionResult> GetLastMonthlyFinanceCount()
+        {
+            var response = await _service.GetLastMonthlyFinanceCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetThisYearFinanceCount")]
+        public async Task<IActionResult> GetThisYearFinanceCount()
+        {
+            var response = await _service.GetThisYearFinanceCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetLastYearFinanceCount")]
+        public async Task<IActionResult> GetLastYearFinanceCount()
+        {
+            var response = await _service.GetLastYearFinanceCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
         [HttpPut("UpdateFinance/{id}")]
         public async Task<IActionResult> UpdateFinance(int id, [FromBody] Finance finance)
         {
