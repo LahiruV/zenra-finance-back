@@ -37,7 +37,7 @@ namespace zenra_finance_back.Services
             try
             {
                 var finances = await _context.Finances
-                    .OrderByDescending(f => f.Id)
+                    .OrderByDescending(f => f.Date)
                     .ToListAsync();
                 return Response<List<Finance>>.Success(finances, "Finances retrieved successfully");
             }
