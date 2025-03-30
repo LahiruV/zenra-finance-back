@@ -23,6 +23,7 @@ namespace zenra_finance_back.Services
             try
             {
                 await _context.Finances.AddAsync(finance);
+                await _context.SaveChangesAsync();
                 return Response<Finance>.Success(null, "Finance created successfully");
             }
             catch (Exception ex)
