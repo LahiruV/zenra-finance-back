@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using zenra_finance_back.Data;
@@ -20,6 +20,17 @@ builder.Services.AddCors(options =>
                    .AllowAnyHeader();
         });
 });
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll",
+//        builder =>
+//        {
+//            builder.WithOrigins("https://zenra-finance.netlify.app")
+//                   .AllowAnyMethod()
+//                   .AllowAnyHeader()
+//                   .AllowCredentials(); // 🔹 Only works when a specific origin is set
+//        });
+//});
 
 // Add DbContext to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
