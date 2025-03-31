@@ -11,7 +11,7 @@ namespace zenra_finance_back.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class FinanceController : ControllerBase
     {
         private readonly IFinanceService _service;
@@ -83,6 +83,17 @@ namespace zenra_finance_back.Controllers
         public async Task<IActionResult> GetLastYearFinanceCount()
         {
             var response = await _service.GetLastYearFinanceCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetFinanceByYear/{year}")]
+        public async Task<IActionResult> GetFinanceByYear(int year)
+        {
+            var response = await _service.GetFinanceByYear(year);
             if (response.IsSuccess)
             {
                 return Ok(response);

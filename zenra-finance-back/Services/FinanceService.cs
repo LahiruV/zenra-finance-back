@@ -141,6 +141,47 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<List<MonthFinanceResponse>>> GetFinanceByYear(int year)
+        {
+            try
+            {
+                // Create a list of all 12 months
+                var allMonths = Enumerable.Range(1, 12)
+                    .Select(m => new MonthFinanceResponse
+                    {
+                        Month = m.ToString(),
+                        Amount = 0
+                    });
+
+                // Get the actual finance data from database
+                var monthlyFinances = await _context.Finances
+                    .Where(f => f.Date.Year == year)
+                    .GroupBy(f => f.Date.Month)
+                    .Select(g => new MonthFinanceResponse
+                    {
+                        Month = g.Key.ToString(),
+                        Amount = g.Sum(f => f.Amount)
+                    })
+                    .ToListAsync();
+
+                // Combine the results - update allMonths with actual data where it exists
+                var result = allMonths
+                    .GroupJoin(monthlyFinances,
+                        all => all.Month,
+                        actual => actual.Month,
+                        (all, actual) => actual.Any()
+                            ? actual.First()
+                            : all)
+                    .ToList();
+
+                return Response<List<MonthFinanceResponse>>.Success(result, "Monthly finance count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<List<MonthFinanceResponse>>.Failure("Failed to retrieve monthly finance count", ex.ToString());
+            }
+        }
+
         public async Task<Response<Finance>> UpdateFinance(int id, Finance finance)
         {
             try
