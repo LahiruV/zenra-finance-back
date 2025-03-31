@@ -21,5 +21,4 @@ RUN dotnet publish "zenra-finance-back.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-COPY zenra-finance-back.pfx /app/zenra-finance-back.pfx
 ENTRYPOINT ["dotnet", "zenra-finance-back.dll"]
