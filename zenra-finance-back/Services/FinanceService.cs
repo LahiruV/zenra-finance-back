@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -145,26 +146,26 @@ namespace zenra_finance_back.Services
         {
             try
             {
-                // Create a list of all 12 months
+               
                 var allMonths = Enumerable.Range(1, 12)
                     .Select(m => new MonthFinanceResponse
                     {
-                        Month = m.ToString(),
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m),
                         Amount = 0
                     });
 
-                // Get the actual finance data from database
+                
                 var monthlyFinances = await _context.Finances
                     .Where(f => f.Date.Year == year)
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthFinanceResponse
                     {
-                        Month = g.Key.ToString(),
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.Key),
                         Amount = g.Sum(f => f.Amount)
                     })
                     .ToListAsync();
 
-                // Combine the results - update allMonths with actual data where it exists
+                
                 var result = allMonths
                     .GroupJoin(monthlyFinances,
                         all => all.Month,
