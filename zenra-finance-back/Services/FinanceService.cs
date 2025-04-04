@@ -146,33 +146,30 @@ namespace zenra_finance_back.Services
         {
             try
             {
-               
                 var allMonths = Enumerable.Range(1, 12)
                     .Select(m => new MonthFinanceResponse
                     {
-                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m),
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m),
                         Amount = 0
                     });
 
-                
                 var monthlyFinances = await _context.Finances
                     .Where(f => f.Date.Year == year)
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthFinanceResponse
                     {
-                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(g.Key),
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Key),
                         Amount = g.Sum(f => f.Amount)
                     })
                     .ToListAsync();
 
-                
                 var result = allMonths
                     .GroupJoin(monthlyFinances,
-                        all => all.Month,
-                        actual => actual.Month,
-                        (all, actual) => actual.Any()
-                            ? actual.First()
-                            : all)
+                    all => all.Month,
+                    actual => actual.Month,
+                    (all, actual) => actual.Any()
+                        ? actual.First()
+                        : all)
                     .ToList();
 
                 return Response<List<MonthFinanceResponse>>.Success(result, "Monthly finance count retrieved successfully");
