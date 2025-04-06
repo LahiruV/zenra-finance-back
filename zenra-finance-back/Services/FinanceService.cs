@@ -180,6 +180,53 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<List<CurrentWeekDailyFinanceResponse>>> GetCurrentWeekDailyFinanceCount()
+        {
+            try
+            {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var daysSinceSunday = (int)today.DayOfWeek;
+                var weekStart = today.AddDays(-daysSinceSunday);
+
+                var weekEnd = weekStart.AddDays(6);
+                var dailyFinances = await _context.Finances
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .GroupBy(f => f.Date)
+                    .Select(g => new CurrentWeekDailyFinanceResponse
+                    {
+                        Day = g.Key.ToString("dddd"),
+                        Amount = g.Sum(f => f.Amount)
+                    })
+                    .ToListAsync();
+
+                var result = new List<CurrentWeekDailyFinanceResponse>();
+                for (int i = 0; i < 7; i++)
+                {
+                    var currentDay = weekStart.AddDays(i);
+                    var dayName = currentDay.ToString("dddd");
+                    var existingRecord = dailyFinances.FirstOrDefault(d => d.Day == dayName);
+
+                    result.Add(new CurrentWeekDailyFinanceResponse
+                    {
+                        Day = dayName,
+                        Amount = existingRecord?.Amount ?? 0m
+                    });
+                }
+
+                return Response<List<CurrentWeekDailyFinanceResponse>>.Success(
+                    result,
+                    "Current week daily finance counts retrieved successfully"
+                );
+            }
+            catch (Exception ex)
+            {
+                return Response<List<CurrentWeekDailyFinanceResponse>>.Failure(
+                    "Failed to retrieve current week daily finance counts",
+                    ex.ToString()
+                );
+            }
+        }
+
         public async Task<Response<Finance>> UpdateFinance(int id, Finance finance)
         {
             try

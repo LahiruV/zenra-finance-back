@@ -15,6 +15,7 @@ namespace zenra_finance_back.Services.IServices
         Task<Response<YearFinanceResponse>> GetThisYearFinanceCount();
         Task<Response<YearFinanceResponse>> GetLastYearFinanceCount();
         Task<Response<List<MonthFinanceResponse>>> GetFinanceByYear(int year);
+        Task<Response<List<CurrentWeekDailyFinanceResponse>>> GetCurrentWeekDailyFinanceCount();
         Task<Response<Finance>> UpdateFinance(int id, Finance finance);
         Task<Response<Finance>> DeleteFinance(int id);
     }

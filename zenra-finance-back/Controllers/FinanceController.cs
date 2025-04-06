@@ -11,7 +11,7 @@ namespace zenra_finance_back.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    // [Authorize]
     public class FinanceController : ControllerBase
     {
         private readonly IFinanceService _service;
@@ -100,6 +100,18 @@ namespace zenra_finance_back.Controllers
             }
             return BadRequest(response);
         }
+
+        [HttpGet("GetCurrentWeekDailyFinanceCount")]
+        public async Task<IActionResult> GetCurrentWeekDailyFinanceCount()
+        {
+            var response = await _service.GetCurrentWeekDailyFinanceCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
 
         [HttpPut("UpdateFinance/{id}")]
         public async Task<IActionResult> UpdateFinance(int id, [FromBody] Finance finance)
