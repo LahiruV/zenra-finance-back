@@ -194,7 +194,7 @@ namespace zenra_finance_back.Services
                     .GroupBy(f => f.Date)
                     .Select(g => new CurrentWeekDailyFinanceResponse
                     {
-                        Day = g.Key.ToString("dddd"),
+                        Day = g.Key.ToString("ddd"),
                         Amount = g.Sum(f => f.Amount)
                     })
                     .ToListAsync();
@@ -203,7 +203,7 @@ namespace zenra_finance_back.Services
                 for (int i = 0; i < 7; i++)
                 {
                     var currentDay = weekStart.AddDays(i);
-                    var dayName = currentDay.ToString("dddd");
+                    var dayName = currentDay.ToString("ddd");
                     var existingRecord = dailyFinances.FirstOrDefault(d => d.Day == dayName);
 
                     result.Add(new CurrentWeekDailyFinanceResponse
