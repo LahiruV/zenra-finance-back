@@ -20,17 +20,6 @@ builder.Services.AddCors(options =>
                    .AllowAnyHeader();
         });
 });
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowAll",
-//        builder =>
-//        {
-//            builder.WithOrigins("https://zenra-finance.netlify.app")
-//                   .AllowAnyMethod()
-//                   .AllowAnyHeader()
-//                   .AllowCredentials(); // 🔹 Only works when a specific origin is set
-//        });
-//});
 
 // Add DbContext to the container
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -64,6 +53,7 @@ builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<IFinanceService, FinanceService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
+builder.Services.AddHostedService<DailyFinanceExportService>();
 // Add controllers
 builder.Services.AddControllers();
 
