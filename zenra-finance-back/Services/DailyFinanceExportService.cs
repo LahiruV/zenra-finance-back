@@ -18,7 +18,7 @@ namespace zenra_finance_back.Services
         {
             _scopeFactory = scopeFactory;
             _exportPath = configuration["ExportPath"] ?? @"C:\FinanceExports";
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            ExcelPackage.License.SetNonCommercialPersonal("My Name");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
