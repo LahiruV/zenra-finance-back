@@ -48,5 +48,29 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<MonthExpenseResponse>> GetThisMonthlyExpensesCount()
+        {
+            try
+            {
+                var currentMonth = DateTime.UtcNow;
+                var monthlyFinances = await _context.Expenses
+                    .Where(f => f.Date.Year == currentMonth.Year && f.Date.Month == currentMonth.Month)
+                    .ToListAsync();
+
+                var totalAmount = monthlyFinances.Sum(f => f.Amount);
+                var monthName = currentMonth.ToString("MMMM");
+
+                return Response<MonthExpenseResponse>.Success(new MonthExpenseResponse
+                {
+                    Month = monthName,
+                    Amount = totalAmount
+                }, "Monthly expenses count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<MonthExpenseResponse>.Failure("Failed to retrieve monthly finance count", ex.ToString());
+            }
+        }
+
     }
 }
