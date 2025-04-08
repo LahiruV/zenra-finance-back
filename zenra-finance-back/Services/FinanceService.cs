@@ -227,6 +227,23 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<decimal>> GetAllFinancesCount()
+        {
+            try
+            {
+                var allFinances = await _context.Finances
+                    .ToListAsync();
+
+                var totalAmount = allFinances.Sum(f => f.Amount);
+
+                return Response<decimal>.Success(totalAmount, "All finances count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<decimal>.Failure("Failed to retrieve all finances count", ex.ToString());
+            }
+        }
+
         public async Task<Response<Finance>> UpdateFinance(int id, Finance finance)
         {
             try

@@ -112,6 +112,17 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("GetAllFinancesCount")]
+        public async Task<IActionResult> GetAllFinancesCount()
+        {
+            var response = await _service.GetAllFinancesCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
 
         [HttpPut("UpdateFinance/{id}")]
         public async Task<IActionResult> UpdateFinance(int id, [FromBody] Finance finance)
