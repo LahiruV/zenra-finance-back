@@ -11,7 +11,7 @@ namespace zenra_finance_back.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    // [Authorize]
+    [Authorize]
     public class FinanceController : ControllerBase
     {
         private readonly IFinanceService _service;

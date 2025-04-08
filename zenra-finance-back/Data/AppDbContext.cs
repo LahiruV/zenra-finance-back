@@ -10,5 +10,6 @@ namespace zenra_finance_back.Data
         public DbSet<YourEntity> YourEntities { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Finance> Finances { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
     }
 }
