@@ -53,6 +53,7 @@ builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<IFinanceService, FinanceService>();
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 
+builder.Services.AddSingleton<DailyFinanceExportService>();
 builder.Services.AddHostedService<DailyFinanceExportService>();
 // Add controllers
 builder.Services.AddControllers();
