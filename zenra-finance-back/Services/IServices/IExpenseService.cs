@@ -11,5 +11,7 @@ namespace zenra_finance_back.Services.IServices
         Task<Response<Expense>> AddExpense(Expense expense);
         Task<Response<List<Expense>>> GetExpense();
         Task<Response<MonthExpenseResponse>> GetThisMonthlyExpensesCount();
+        Task<Response<decimal>> GetTodayExpensesCount();
+        Task<Response<decimal>> GetAllExpensesCount();
     }
 }

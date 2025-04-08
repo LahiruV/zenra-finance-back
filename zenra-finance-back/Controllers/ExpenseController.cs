@@ -57,5 +57,27 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("GetTodayExpensesCount")]
+        public async Task<IActionResult> GetTodayExpensesCount()
+        {
+            var response = await _service.GetTodayExpensesCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetAllExpensesCount")]
+        public async Task<IActionResult> GetAllExpensesCount()
+        {
+            var response = await _service.GetAllExpensesCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
     }
 }

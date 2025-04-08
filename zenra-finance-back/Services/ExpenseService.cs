@@ -72,5 +72,41 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<decimal>> GetTodayExpensesCount()
+        {
+            try
+            {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var dailyExpenses = await _context.Expenses
+                    .Where(f => f.Date == today)
+                    .ToListAsync();
+
+                var totalAmount = dailyExpenses.Sum(f => f.Amount);
+
+                return Response<decimal>.Success(totalAmount, "Today's expenses count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<decimal>.Failure("Failed to retrieve today's expenses count", ex.ToString());
+            }
+        }
+
+        public async Task<Response<decimal>> GetAllExpensesCount()
+        {
+            try
+            {
+                var allExpenses = await _context.Expenses
+                    .ToListAsync();
+
+                var totalAmount = allExpenses.Sum(f => f.Amount);
+
+                return Response<decimal>.Success(totalAmount, "All expenses count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<decimal>.Failure("Failed to retrieve all expenses count", ex.ToString());
+            }
+        }
+
     }
 }
