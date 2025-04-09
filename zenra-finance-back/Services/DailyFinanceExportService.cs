@@ -17,7 +17,7 @@ namespace zenra_finance_back.Services
         public DailyFinanceExportService(IServiceScopeFactory scopeFactory, IConfiguration configuration)
         {
             _scopeFactory = scopeFactory;
-            _exportPath = configuration["ExportPath"] ?? @"C:\FinanceExports";
+            _exportPath = configuration["ExportPath"] ?? @"FinanceExports";
             ExcelPackage.License.SetNonCommercialPersonal("My Name");
         }
 
