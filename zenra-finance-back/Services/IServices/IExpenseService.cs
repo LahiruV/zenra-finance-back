@@ -13,5 +13,7 @@ namespace zenra_finance_back.Services.IServices
         Task<Response<MonthExpenseResponse>> GetThisMonthlyExpensesCount();
         Task<Response<decimal>> GetTodayExpensesCount();
         Task<Response<decimal>> GetAllExpensesCount();
+        Task<Response<List<CurrentWeekDailyExpenseResponse>>> GetCurrentWeekDailyExpenseCount();
+        Task<Response<List<MonthExpenseResponse>>> GetExpenseeByYear(int year);
     }
 }

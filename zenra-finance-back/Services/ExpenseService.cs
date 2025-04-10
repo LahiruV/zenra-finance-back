@@ -108,5 +108,90 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<List<CurrentWeekDailyExpenseResponse>>> GetCurrentWeekDailyExpenseCount()
+        {
+            try
+            {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var daysSinceSunday = (int)today.DayOfWeek;
+                var weekStart = today.AddDays(-daysSinceSunday);
+
+                var weekEnd = weekStart.AddDays(6);
+                var dailyExpenses = await _context.Expenses
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .GroupBy(f => f.Date)
+                    .Select(g => new CurrentWeekDailyExpenseResponse
+                    {
+                        Day = g.Key.ToString("ddd"),
+                        Amount = g.Sum(f => f.Amount)
+                    })
+                    .ToListAsync();
+
+                var result = new List<CurrentWeekDailyExpenseResponse>();
+                for (int i = 0; i < 7; i++)
+                {
+                    var currentDay = weekStart.AddDays(i);
+                    var dayName = currentDay.ToString("ddd");
+                    var existingRecord = dailyExpenses.FirstOrDefault(d => d.Day == dayName);
+
+                    result.Add(new CurrentWeekDailyExpenseResponse
+                    {
+                        Day = dayName,
+                        Amount = existingRecord?.Amount ?? 0m
+                    });
+                }
+
+                return Response<List<CurrentWeekDailyExpenseResponse>>.Success(
+                    result,
+                    "Current week daily expenses counts retrieved successfully"
+                );
+            }
+            catch (Exception ex)
+            {
+                return Response<List<CurrentWeekDailyExpenseResponse>>.Failure(
+                    "Failed to retrieve current week daily expenses counts",
+                    ex.ToString()
+                );
+            }
+        }
+
+        public async Task<Response<List<MonthExpenseResponse>>> GetExpenseeByYear(int year)
+        {
+            try
+            {
+                var allMonths = Enumerable.Range(1, 12)
+                    .Select(m => new MonthExpenseResponse
+                    {
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m),
+                        Amount = 0
+                    });
+
+                var monthlyExpenses = await _context.Expenses
+                    .Where(f => f.Date.Year == year)
+                    .GroupBy(f => f.Date.Month)
+                    .Select(g => new MonthExpenseResponse
+                    {
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Key),
+                        Amount = g.Sum(f => f.Amount)
+                    })
+                    .ToListAsync();
+
+                var result = allMonths
+                    .GroupJoin(monthlyExpenses,
+                    all => all.Month,
+                    actual => actual.Month,
+                    (all, actual) => actual.Any()
+                        ? actual.First()
+                        : all)
+                    .ToList();
+
+                return Response<List<MonthExpenseResponse>>.Success(result, "Monthly finance count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<List<MonthExpenseResponse>>.Failure("Failed to retrieve monthly finance count", ex.ToString());
+            }
+        }
+
     }
 }

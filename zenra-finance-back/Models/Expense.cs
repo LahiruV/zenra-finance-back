@@ -19,4 +19,10 @@ namespace zenra_finance_back.Models
         public string Month { get; set; }
         public decimal Amount { get; set; }
     }
+
+    public class CurrentWeekDailyExpenseResponse
+    {
+        public string Day { get; set; }
+        public decimal Amount { get; set; }
+    }
 }
