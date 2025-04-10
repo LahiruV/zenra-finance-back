@@ -192,6 +192,68 @@ namespace zenra_finance_back.Services
                 return Response<List<MonthExpenseResponse>>.Failure("Failed to retrieve monthly finance count", ex.ToString());
             }
         }
+        public async Task<Response<List<CurrentWeekDailyIncomeExpenseResponse>>> GetCurrentWeekDailyIncomeExpenseCount()
+        {
+            try
+            {
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                var daysSinceSunday = (int)today.DayOfWeek;
+                var weekStart = today.AddDays(-daysSinceSunday);
+                var weekEnd = weekStart.AddDays(6);
+
+                // Get expenses
+                var dailyExpenses = await _context.Expenses
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .GroupBy(f => f.Date)
+                    .Select(g => new
+                    {
+                        Day = g.Key.ToString("ddd"),
+                        Amount = g.Sum(f => f.Amount)
+                    })
+                    .ToListAsync();
+
+                // Get income (finances)
+                var dailyFinances = await _context.Finances
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .GroupBy(f => f.Date)
+                    .Select(g => new
+                    {
+                        Day = g.Key.ToString("ddd"),
+                        Amount = g.Sum(f => f.Amount)
+                    })
+                    .ToListAsync();
+
+                // Combine results
+                var result = new List<CurrentWeekDailyIncomeExpenseResponse>();
+                for (int i = 0; i < 7; i++)
+                {
+                    var currentDay = weekStart.AddDays(i);
+                    var dayName = currentDay.ToString("ddd");
+                    var expenseRecord = dailyExpenses.FirstOrDefault(d => d.Day == dayName);
+                    var incomeRecord = dailyFinances.FirstOrDefault(d => d.Day == dayName);
+
+                    result.Add(new CurrentWeekDailyIncomeExpenseResponse
+                    {
+                        Day = dayName,
+                        AmountExpense = expenseRecord?.Amount ?? 0m,
+                        AmountIncome = incomeRecord?.Amount ?? 0m
+                    });
+                }
+
+                return Response<List<CurrentWeekDailyIncomeExpenseResponse>>.Success(
+                    result,
+                    "Current week daily income and expense counts retrieved successfully"
+                );
+            }
+            catch (Exception ex)
+            {
+                return Response<List<CurrentWeekDailyIncomeExpenseResponse>>.Failure(
+                    "Failed to retrieve current week daily income and expense counts",
+                    ex.ToString()
+                );
+            }
+        }
 
     }
+
 }

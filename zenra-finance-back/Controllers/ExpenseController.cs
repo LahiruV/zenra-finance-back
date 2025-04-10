@@ -101,5 +101,16 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("GetCurrentWeekDailyIncomeExpenseCount")]
+        public async Task<IActionResult> GetCurrentWeekDailyIncomeExpenseCount()
+        {
+            var response = await _service.GetCurrentWeekDailyIncomeExpenseCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
     }
 }

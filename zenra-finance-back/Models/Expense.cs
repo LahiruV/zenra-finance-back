@@ -25,4 +25,11 @@ namespace zenra_finance_back.Models
         public string Day { get; set; }
         public decimal Amount { get; set; }
     }
+
+    public class CurrentWeekDailyIncomeExpenseResponse
+    {
+        public string Day { get; set; }
+        public decimal AmountIncome { get; set; }
+        public decimal AmountExpense { get; set; }
+    }
 }
