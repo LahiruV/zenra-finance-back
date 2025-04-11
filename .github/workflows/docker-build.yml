@@ -48,7 +48,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: .
-        file: ./Dockerfile
+        file: ./zenra-finance-back/Dockerfile
         push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:latest
