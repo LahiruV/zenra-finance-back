@@ -23,11 +23,11 @@ jobs:
 
       # Restore dependencies
       - name: Restore dependencies
-        run: dotnet restore zenra-finance-back.csproj
+        run: dotnet restore
 
       # Build the .NET project
       - name: Build
-        run: dotnet build zenra-finance-back.csproj --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration Release
 
       # Run tests
       - name: Test
