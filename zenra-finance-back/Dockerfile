@@ -11,6 +11,7 @@ COPY ["zenra-finance-back/zenra-finance-back.csproj", "./"]
 RUN dotnet restore "zenra-finance-back.csproj"
 COPY . .
 WORKDIR "/src/."
+RUN dotnet clean
 RUN dotnet build "zenra-finance-back.csproj" -c Release -o /app/build
 
 # Publish the app
