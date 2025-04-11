@@ -40,8 +40,8 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.lahiruv }}
-        password: ${{ secrets.dckr_pat_omaiam6jVvcV4NPEYw-zlLYl6JE }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     # Build and push Docker image
     - name: Build and push Docker image
@@ -51,8 +51,8 @@ jobs:
         file: ./Dockerfile
         push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         tags: |
-          ${{ secrets.lahiruv }}/zenra-finance-back:latest
-          ${{ secrets.dckr_pat_omaiam6jVvcV4NPEYw-zlLYl6JE }}/zenra-finance-back:${{ github.sha }}
+          ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:latest
+          ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:${{ github.sha }}
 
     # Upload build artifacts (optional, for debugging or deployment)
     - name: Upload build artifacts
