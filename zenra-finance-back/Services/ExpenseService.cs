@@ -254,6 +254,65 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<List<MonthIncomeExpenseResponse>>> GetMonthlyIncomeExpenseCount()
+        {
+            try
+            {
+                var allMonths = Enumerable.Range(1, 12)
+                    .Select(m => new MonthIncomeExpenseResponse
+                    {
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(m),
+                        AmountIncome = 0,
+                        AmountExpense = 0
+                    });
+
+                var monthlyExpenses = await _context.Expenses
+                    .GroupBy(f => f.Date.Month)
+                    .Select(g => new MonthIncomeExpenseResponse
+                    {
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Key),
+                        AmountExpense = g.Sum(f => f.Amount),
+                        AmountIncome = 0
+                    })
+                    .ToListAsync();
+
+                var monthlyFinances = await _context.Finances
+                    .GroupBy(f => f.Date.Month)
+                    .Select(g => new MonthIncomeExpenseResponse
+                    {
+                        Month = CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(g.Key),
+                        AmountIncome = g.Sum(f => f.Amount),
+                        AmountExpense = 0
+                    })
+                    .ToListAsync();
+
+                var result = allMonths
+                    .GroupJoin(monthlyExpenses,
+                    all => all.Month,
+                    actual => actual.Month,
+                    (all, actual) => actual.Any()
+                        ? actual.First()
+                        : all)
+                    .GroupJoin(monthlyFinances,
+                    all => all.Month,
+                    actual => actual.Month,
+                    (all, actual) =>
+                        new MonthIncomeExpenseResponse
+                        {
+                            Month = all.Month,
+                            AmountExpense = all.AmountExpense + (actual.Any() ? actual.First().AmountExpense : 0),
+                            AmountIncome = all.AmountIncome + (actual.Any() ? actual.First().AmountIncome : 0)
+                        })
+                    .ToList();
+
+                return Response<List<MonthIncomeExpenseResponse>>.Success(result, "Monthly income and expense count retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<List<MonthIncomeExpenseResponse>>.Failure("Failed to retrieve monthly income and expense count", ex.ToString());
+            }
+        }
+
     }
 
 }

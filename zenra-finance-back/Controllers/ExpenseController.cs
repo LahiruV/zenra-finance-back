@@ -112,5 +112,16 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("GetMonthlyIncomeExpenseCount")]
+        public async Task<IActionResult> GetMonthlyIncomeExpenseCount()
+        {
+            var response = await _service.GetMonthlyIncomeExpenseCount();
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
     }
 }

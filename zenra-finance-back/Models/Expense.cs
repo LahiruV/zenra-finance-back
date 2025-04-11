@@ -32,4 +32,11 @@ namespace zenra_finance_back.Models
         public decimal AmountIncome { get; set; }
         public decimal AmountExpense { get; set; }
     }
+
+    public class MonthIncomeExpenseResponse
+    {
+        public string Month { get; set; }
+        public decimal AmountIncome { get; set; }
+        public decimal AmountExpense { get; set; }
+    }
 }
