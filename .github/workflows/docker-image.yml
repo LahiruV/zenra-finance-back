@@ -27,7 +27,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build . \
-            --file Dockerfile \
+          docker build ./zenra-finance-back \
+            --file ./zenra-finance-back/Dockerfile \
             --tag zenra-finance-back:latest \
             --tag zenra-finance-back:${{ github.sha }}
