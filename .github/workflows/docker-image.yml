@@ -25,6 +25,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
 
+      - name: Generate self-signed cert and .pfx
+        run: |
+          mkdir -p ./zenra-finance-back
+          openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/CN=localhost"
+          openssl pkcs12 -export -out ./zenra-finance-back/zenra-finance-back.pfx -inkey key.pem -in cert.pem -passout pass:YourPassword123!
+        shell: bash
+
       - name: Build Docker image
         run: |
           docker build ./zenra-finance-back \
