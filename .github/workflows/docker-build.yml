@@ -22,21 +22,24 @@ jobs:
 
     # Restore dependencies
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore zenra-finance-back.csproj
+      working-directory: .
 
     # Build the .NET project
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build zenra-finance-back.csproj --no-restore --configuration Release
+      working-directory: .
 
     # Run tests
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      working-directory: .
 
     # Set up Docker Buildx
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    # Log in to Docker Hub (or another registry)
+    # Log in to Docker Hub
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
@@ -54,7 +57,7 @@ jobs:
           ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:latest
           ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:${{ github.sha }}
 
-    # Upload build artifacts (optional, for debugging or deployment)
+    # Upload build artifacts
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
