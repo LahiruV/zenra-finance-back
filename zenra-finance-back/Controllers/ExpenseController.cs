@@ -112,10 +112,10 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
-        [HttpGet("GetMonthlyIncomeExpenseCount")]
-        public async Task<IActionResult> GetMonthlyIncomeExpenseCount()
+        [HttpGet("GetIncomeExpenseByYear/{year}")]
+        public async Task<IActionResult> GetIncomeExpenseByYear(int year)
         {
-            var response = await _service.GetMonthlyIncomeExpenseCount();
+            var response = await _service.GetIncomeExpenseeByYear(year);
             if (response.IsSuccess)
             {
                 return Ok(response);

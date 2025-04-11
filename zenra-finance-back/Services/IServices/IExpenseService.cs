@@ -16,6 +16,6 @@ namespace zenra_finance_back.Services.IServices
         Task<Response<List<CurrentWeekDailyExpenseResponse>>> GetCurrentWeekDailyExpenseCount();
         Task<Response<List<MonthExpenseResponse>>> GetExpenseeByYear(int year);
         Task<Response<List<CurrentWeekDailyIncomeExpenseResponse>>> GetCurrentWeekDailyIncomeExpenseCount();
-        Task<Response<List<MonthIncomeExpenseResponse>>> GetMonthlyIncomeExpenseCount();
+        Task<Response<List<MonthIncomeExpenseResponse>>> GetIncomeExpenseeByYear(int year);
     }
 }

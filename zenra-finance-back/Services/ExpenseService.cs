@@ -254,7 +254,7 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<List<MonthIncomeExpenseResponse>>> GetMonthlyIncomeExpenseCount()
+        public async Task<Response<List<MonthIncomeExpenseResponse>>> GetIncomeExpenseeByYear(int year)
         {
             try
             {
@@ -267,6 +267,7 @@ namespace zenra_finance_back.Services
                     });
 
                 var monthlyExpenses = await _context.Expenses
+                    .Where(f => f.Date.Year == year)
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthIncomeExpenseResponse
                     {
@@ -277,6 +278,7 @@ namespace zenra_finance_back.Services
                     .ToListAsync();
 
                 var monthlyFinances = await _context.Finances
+                    .Where(f => f.Date.Year == year)
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthIncomeExpenseResponse
                     {
@@ -305,11 +307,11 @@ namespace zenra_finance_back.Services
                         })
                     .ToList();
 
-                return Response<List<MonthIncomeExpenseResponse>>.Success(result, "Monthly income and expense count retrieved successfully");
+                return Response<List<MonthIncomeExpenseResponse>>.Success(result, "Monthly finance count retrieved successfully");
             }
             catch (Exception ex)
             {
-                return Response<List<MonthIncomeExpenseResponse>>.Failure("Failed to retrieve monthly income and expense count", ex.ToString());
+                return Response<List<MonthIncomeExpenseResponse>>.Failure("Failed to retrieve monthly finance count", ex.ToString());
             }
         }
 
