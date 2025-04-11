@@ -22,13 +22,13 @@ jobs:
 
     # Restore dependencies
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./zenra-finance-back/zenra-finance-back.csproj
 
     # Build the .NET project
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build ./zenra-finance-back/zenra-finance-back.csproj --no-restore --configuration Release
 
-    # Run tests
+    # Run tests (if you have a test project, update the path accordingly)
     - name: Test
       run: dotnet test --no-build --verbosity normal
 
@@ -47,18 +47,18 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
-        context: .
+        context: ./zenra-finance-back
         file: ./zenra-finance-back/Dockerfile
         push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         tags: |
           ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:latest
           ${{ secrets.DOCKER_USERNAME }}/zenra-finance-back:${{ github.sha }}
 
-    # Upload build artifacts (optional, for debugging or deployment)
+    # Upload build artifacts (optional)
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: dotnet-build
         path: |
-          **/bin/Release/**
-          **/obj/Release/**
+          zenra-finance-back/bin/Release/
+          zenra-finance-back/obj/Release/
