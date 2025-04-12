@@ -71,11 +71,8 @@ namespace zenra_finance_back.Services
                 foreach (var file in files)
                 {
                     var creationTime = File.GetCreationTime(file);
-                    if (creationTime < cutoffDate)
-                    {
-                        File.Delete(file);
-                        Console.WriteLine($"Deleted old finance export: {file}");
-                    }
+                    File.Delete(file);
+                    Console.WriteLine($"Deleted old finance export: {file}");
                 }
             }
             catch (Exception ex)
