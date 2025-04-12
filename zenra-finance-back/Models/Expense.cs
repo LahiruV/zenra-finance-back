@@ -5,8 +5,7 @@ namespace zenra_finance_back.Models
     public class Expense
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "User ID is required")]
-        public string UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
         [Required(ErrorMessage = "Date is required")]
         public DateOnly Date { get; set; }
         [Required(ErrorMessage = "Expense type is required")]
