@@ -36,6 +36,21 @@ namespace zenra_finance_back.Services
             }
         }
 
+        public async Task<Response<List<Expense>>> GetAllExpense()
+        {
+            try
+            {
+                var expenses = await _context.Expenses
+                    .OrderByDescending(f => f.Date)
+                    .ToListAsync();
+                return Response<List<Expense>>.Success(expenses, "Expenses retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<List<Expense>>.Failure("Failed to retrieve finances", ex.ToString());
+            }
+        }
+
         public async Task<Response<List<Expense>>> GetExpense(string accessToken)
         {
             TokenService tokenService = new TokenService();

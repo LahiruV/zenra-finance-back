@@ -27,6 +27,7 @@ namespace zenra_finance_back.Services
             {
                 await CleanOldExcelFiles();
                 await ExportFinancesToExcel();
+                await ExportExpensesToExcel();
                 return Response<object>.Success(null, "Backup created successfully");
             }
             catch (Exception ex)
@@ -133,6 +134,58 @@ namespace zenra_finance_back.Services
 
                     await package.SaveAsync();
                 }
+            }
+
+        }
+
+        private async Task ExportExpensesToExcel()
+        {
+            Directory.CreateDirectory(_exportPath);
+
+            // Create a scope to resolve IFinanceService
+            using (var scope = _scopeFactory.CreateScope())
+            {
+                var financeService = scope.ServiceProvider.GetRequiredService<IExpenseService>();
+                var financeResponse = await financeService.GetAllExpense();
+                if (!financeResponse.IsSuccess || financeResponse.Result == null)
+                {
+                    Console.WriteLine($"Failed to get finances: {financeResponse.Message}");
+                    return;
+                }
+                var finances = financeResponse.Result;
+                var date = DateTime.Now.ToString("yyyy-MM-dd");
+                var filePath = Path.Combine(_exportPath, $"Expenses_{date}.xlsx");
+                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                {
+                    var worksheet = package.Workbook.Worksheets.Add("Expenses");
+
+                    worksheet.Cells[1, 1].Value = "ID";
+                    worksheet.Cells[1, 2].Value = "Date";
+                    worksheet.Cells[1, 3].Value = "Expense Type";
+                    worksheet.Cells[1, 4].Value = "Amount";
+                    worksheet.Cells[1, 5].Value = "Created At";
+
+                    int row = 2;
+                    foreach (var finance in finances)
+                    {
+                        worksheet.Cells[row, 1].Value = finance.Id;
+                        worksheet.Cells[row, 2].Value = finance.Date.ToString("yyyy-MM-dd");
+                        worksheet.Cells[row, 3].Value = finance.ExpenseType;
+                        worksheet.Cells[row, 4].Value = (double)finance.Amount;
+                        worksheet.Cells[row, 5].Value = finance.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
+                        row++;
+                    }
+
+                    worksheet.Cells[1, 1, 1, 5].Style.Font.Bold = true;
+                    worksheet.Cells[1, 1, row - 1, 5].AutoFitColumns();
+
+                    worksheet.Cells[row, 3].Value = "Total";
+                    worksheet.Cells[row, 4].Formula = $"SUM(D2:D{row - 1})";
+                    worksheet.Cells[row, 3, row, 4].Style.Font.Bold = true;
+
+                    await package.SaveAsync();
+                }
+
             }
         }
     }
