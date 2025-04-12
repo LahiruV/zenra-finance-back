@@ -9,6 +9,7 @@ namespace zenra_finance_back.Services.IServices
     public interface IFinanceService
     {
         Task<Response<Finance>> AddFinance(Finance finance, string accessToken);
+        Task<Response<List<Finance>>> GetAllFinance();
         Task<Response<List<Finance>>> GetFinance(string accessToken);
         Task<Response<MonthFinanceResponse>> GetThisMonthlyFinanceCount(string accessToken);
         Task<Response<MonthFinanceResponse>> GetLastMonthlyFinanceCount(string accessToken);

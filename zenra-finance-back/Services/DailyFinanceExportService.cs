@@ -21,17 +21,17 @@ namespace zenra_finance_back.Services
             ExcelPackage.License.SetNonCommercialPersonal("My Name");
         }
 
-        public async Task<Response<string>> GenerateDockerBackup()
+        public async Task<Response<object>> DockerBackupDataGenerator()
         {
             try
             {
                 await CleanOldExcelFiles();
                 await ExportFinancesToExcel();
-                return new Response<string> { IsSuccess = true, Message = "Exported successfully" };
+                return Response<object>.Success(null, "Backup created successfully");
             }
             catch (Exception ex)
             {
-                return new Response<string> { IsSuccess = false, Message = ex.Message };
+                return Response<object>.Failure("Failed to generate backup", ex.ToString());
             }
         }
 
@@ -92,7 +92,7 @@ namespace zenra_finance_back.Services
             {
                 var financeService = scope.ServiceProvider.GetRequiredService<IFinanceService>();
 
-                var financeResponse = await financeService.GetFinance("1");
+                var financeResponse = await financeService.GetAllFinance();
                 if (!financeResponse.IsSuccess || financeResponse.Result == null)
                 {
                     Console.WriteLine($"Failed to get finances: {financeResponse.Message}");

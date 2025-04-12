@@ -20,10 +20,10 @@ namespace zenra_finance_back.Controllers
             _exportService = exportService;
         }
 
-        [HttpPost("ExportToExcel")]
-        public async Task<IActionResult> ExportNow()
+        [HttpPost("DockerBackupDataGenerator")]
+        public async Task<IActionResult> DockerBackupDataGenerator()
         {
-            var response = await _exportService.GenerateDockerBackup();
+            var response = await _exportService.DockerBackupDataGenerator();
             if (response.IsSuccess)
             {
                 return Ok(response);
