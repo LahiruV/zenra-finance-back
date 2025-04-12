@@ -23,16 +23,17 @@ namespace zenra_finance_back.Controllers
         [HttpPost("AddExpense")]
         public async Task<IActionResult> AddExpense([FromBody] Expense expense)
         {
-            if (ModelState.IsValid)
+            var accessToken = Request.Headers["Authorization"].ToString();
+            if (accessToken.StartsWith("Bearer "))
             {
-                var response = await _service.AddExpense(expense);
-                if (response.IsSuccess)
-                {
-                    return Ok(response);
-                }
-                return BadRequest(response);
+                accessToken = accessToken.Substring("Bearer ".Length);
             }
-            return BadRequest("Some properties are not valid");
+            var response = await _service.AddExpense(expense, accessToken);
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
         }
 
         [HttpGet("GetExpense")]

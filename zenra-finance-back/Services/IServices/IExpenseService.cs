@@ -8,7 +8,7 @@ namespace zenra_finance_back.Services.IServices
 {
     public interface IExpenseService
     {
-        Task<Response<Expense>> AddExpense(Expense expense);
+        Task<Response<Expense>> AddExpense(Expense expense, string accessToken);
         Task<Response<List<Expense>>> GetExpense();
         Task<Response<MonthExpenseResponse>> GetThisMonthlyExpensesCount();
         Task<Response<decimal>> GetTodayExpensesCount();

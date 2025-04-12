@@ -19,8 +19,11 @@ namespace zenra_finance_back.Services
             _context = context;
         }
 
-        public async Task<Response<Expense>> AddExpense(Expense expense)
+        public async Task<Response<Expense>> AddExpense(Expense expense, string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
+            expense.UserId = userID.ToString();
             try
             {
                 await _context.Expenses.AddAsync(expense);
