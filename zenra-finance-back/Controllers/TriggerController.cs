@@ -20,7 +20,7 @@ namespace zenra_finance_back.Controllers
             _exportService = exportService;
         }
 
-        [HttpPost("ExportFinancesToExcel")]
+        [HttpPost("ExportToExcel")]
         public async Task<IActionResult> ExportNow()
         {
             try
