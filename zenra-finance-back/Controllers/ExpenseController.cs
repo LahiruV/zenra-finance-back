@@ -15,6 +15,7 @@ namespace zenra_finance_back.Controllers
     public class ExpenseController : ControllerBase
     {
         private readonly IExpenseService _service;
+        private string accessToken => Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         public ExpenseController(IExpenseService service)
         {
             _service = service;
@@ -23,11 +24,6 @@ namespace zenra_finance_back.Controllers
         [HttpPost("AddExpense")]
         public async Task<IActionResult> AddExpense([FromBody] Expense expense)
         {
-            var accessToken = Request.Headers["Authorization"].ToString();
-            if (accessToken.StartsWith("Bearer "))
-            {
-                accessToken = accessToken.Substring("Bearer ".Length);
-            }
             var response = await _service.AddExpense(expense, accessToken);
             if (response.IsSuccess)
             {
@@ -39,7 +35,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetExpense")]
         public async Task<IActionResult> GetExpense()
         {
-            var response = await _service.GetExpense();
+            var response = await _service.GetExpense(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -50,7 +46,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetThisMonthlyExpensesCount")]
         public async Task<IActionResult> GetThisMonthlyExpensesCount()
         {
-            var response = await _service.GetThisMonthlyExpensesCount();
+            var response = await _service.GetThisMonthlyExpensesCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -61,7 +57,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetTodayExpensesCount")]
         public async Task<IActionResult> GetTodayExpensesCount()
         {
-            var response = await _service.GetTodayExpensesCount();
+            var response = await _service.GetTodayExpensesCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -72,7 +68,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetAllExpensesCount")]
         public async Task<IActionResult> GetAllExpensesCount()
         {
-            var response = await _service.GetAllExpensesCount();
+            var response = await _service.GetAllExpensesCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -83,7 +79,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetCurrentWeekDailyExpenseCount")]
         public async Task<IActionResult> GetCurrentWeekDailyExpenseCount()
         {
-            var response = await _service.GetCurrentWeekDailyExpenseCount();
+            var response = await _service.GetCurrentWeekDailyExpenseCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -94,7 +90,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetExpenseByYear/{year}")]
         public async Task<IActionResult> GetExpenseByYear(int year)
         {
-            var response = await _service.GetExpenseeByYear(year);
+            var response = await _service.GetExpenseeByYear(year, accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -105,7 +101,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetCurrentWeekDailyIncomeExpenseCount")]
         public async Task<IActionResult> GetCurrentWeekDailyIncomeExpenseCount()
         {
-            var response = await _service.GetCurrentWeekDailyIncomeExpenseCount();
+            var response = await _service.GetCurrentWeekDailyIncomeExpenseCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -116,7 +112,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetIncomeExpenseByYear/{year}")]
         public async Task<IActionResult> GetIncomeExpenseByYear(int year)
         {
-            var response = await _service.GetIncomeExpenseeByYear(year);
+            var response = await _service.GetIncomeExpenseeByYear(year, accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
