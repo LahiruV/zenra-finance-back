@@ -11,7 +11,7 @@ namespace zenra_finance_back.Services
 {
     public class DailyFinanceExportService : BackgroundService
     {
-        private readonly IServiceScopeFactory _scopeFactory; // Replace IFinanceService with this
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly string _exportPath;
 
         public DailyFinanceExportService(IServiceScopeFactory scopeFactory, IConfiguration configuration)
@@ -49,6 +49,8 @@ namespace zenra_finance_back.Services
                     await Task.Delay(delay, stoppingToken);
                     await CleanOldExcelFiles();
                     await ExportFinancesToExcel();
+                    await ExportExpensesToExcel();
+                    Console.WriteLine($"Export completed at {DateTime.Now}");
                 }
                 catch (Exception ex)
                 {
@@ -60,32 +62,24 @@ namespace zenra_finance_back.Services
 
         private async Task CleanOldExcelFiles()
         {
-            try
+            if (Directory.Exists(_exportPath))
             {
-                if (!Directory.Exists(_exportPath))
-                    return;
-
-                var cutoffDate = DateTime.Now.AddDays(-2);
-                var files = Directory.GetFiles(_exportPath, "Finances_*.xlsx");
-
+                var files = Directory.GetFiles(_exportPath, "*.xlsx");
                 foreach (var file in files)
                 {
-                    var creationTime = File.GetCreationTime(file);
-                    File.Delete(file);
-                    Console.WriteLine($"Deleted old finance export: {file}");
+                    var fileInfo = new FileInfo(file);
+                    fileInfo.Delete();
                 }
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine($"Error cleaning old Excel files: {ex.Message}");
+                Directory.CreateDirectory(_exportPath);
             }
         }
 
         private async Task ExportFinancesToExcel()
         {
             Directory.CreateDirectory(_exportPath);
-
-            // Create a scope to resolve IFinanceService
             using (var scope = _scopeFactory.CreateScope())
             {
                 var financeService = scope.ServiceProvider.GetRequiredService<IFinanceService>();
@@ -138,8 +132,6 @@ namespace zenra_finance_back.Services
         private async Task ExportExpensesToExcel()
         {
             Directory.CreateDirectory(_exportPath);
-
-            // Create a scope to resolve IFinanceService
             using (var scope = _scopeFactory.CreateScope())
             {
                 var financeService = scope.ServiceProvider.GetRequiredService<IExpenseService>();
