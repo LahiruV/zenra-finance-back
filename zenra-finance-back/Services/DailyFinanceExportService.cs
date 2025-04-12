@@ -78,7 +78,7 @@ namespace zenra_finance_back.Services
             {
                 var financeService = scope.ServiceProvider.GetRequiredService<IFinanceService>();
 
-                var financeResponse = await financeService.GetFinance();
+                var financeResponse = await financeService.GetFinance("1");
                 if (!financeResponse.IsSuccess || financeResponse.Result == null)
                 {
                     Console.WriteLine($"Failed to get finances: {financeResponse.Message}");

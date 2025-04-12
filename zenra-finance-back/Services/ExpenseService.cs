@@ -233,7 +233,7 @@ namespace zenra_finance_back.Services
 
                 // Get income (finances)
                 var dailyFinances = await _context.Finances
-                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date)
                     .Select(g => new
                     {
