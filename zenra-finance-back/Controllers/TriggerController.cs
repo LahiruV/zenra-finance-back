@@ -23,15 +23,12 @@ namespace zenra_finance_back.Controllers
         [HttpPost("ExportToExcel")]
         public async Task<IActionResult> ExportNow()
         {
-            try
+            var response = await _exportService.GenerateDockerBackup();
+            if (response.IsSuccess)
             {
-                await _exportService.ExportFinancesToExcel();
-                return Ok("Finance export triggered successfully.");
+                return Ok(response);
             }
-            catch (Exception ex)
-            {
-                return BadRequest($"Export failed: {ex.Message}");
-            }
+            return BadRequest(response);
         }
     }
 }

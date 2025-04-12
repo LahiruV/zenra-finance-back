@@ -21,6 +21,20 @@ namespace zenra_finance_back.Services
             ExcelPackage.License.SetNonCommercialPersonal("My Name");
         }
 
+        public async Task<Response<string>> GenerateDockerBackup()
+        {
+            try
+            {
+                await CleanOldExcelFiles();
+                await ExportFinancesToExcel();
+                return new Response<string> { IsSuccess = true, Message = "Exported successfully" };
+            }
+            catch (Exception ex)
+            {
+                return new Response<string> { IsSuccess = false, Message = ex.Message };
+            }
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -32,7 +46,7 @@ namespace zenra_finance_back.Services
                     var delay = midnight - now;
 
                     await Task.Delay(delay, stoppingToken);
-                    CleanOldExcelFiles();
+                    await CleanOldExcelFiles();
                     await ExportFinancesToExcel();
                 }
                 catch (Exception ex)
@@ -43,7 +57,7 @@ namespace zenra_finance_back.Services
             }
         }
 
-        private void CleanOldExcelFiles()
+        private async Task CleanOldExcelFiles()
         {
             try
             {
@@ -69,7 +83,7 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task ExportFinancesToExcel()
+        private async Task ExportFinancesToExcel()
         {
             Directory.CreateDirectory(_exportPath);
 
