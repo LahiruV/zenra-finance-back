@@ -19,8 +19,11 @@ namespace zenra_finance_back.Services
             _context = context;
         }
 
-        public async Task<Response<Expense>> AddExpense(Expense expense)
+        public async Task<Response<Expense>> AddExpense(Expense expense, string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
+            expense.UserId = userID.ToString();
             try
             {
                 await _context.Expenses.AddAsync(expense);
@@ -33,7 +36,7 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<List<Expense>>> GetExpense()
+        public async Task<Response<List<Expense>>> GetAllExpense()
         {
             try
             {
@@ -48,13 +51,33 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<MonthExpenseResponse>> GetThisMonthlyExpensesCount()
+        public async Task<Response<List<Expense>>> GetExpense(string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
+            try
+            {
+                var expenses = await _context.Expenses
+                .Where(f => f.UserId == userID.ToString())
+                    .OrderByDescending(f => f.Date)
+                    .ToListAsync();
+                return Response<List<Expense>>.Success(expenses, "Expenses retrieved successfully");
+            }
+            catch (Exception ex)
+            {
+                return Response<List<Expense>>.Failure("Failed to retrieve finances", ex.ToString());
+            }
+        }
+
+        public async Task<Response<MonthExpenseResponse>> GetThisMonthlyExpensesCount(string accessToken)
+        {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var currentMonth = DateTime.UtcNow;
                 var monthlyFinances = await _context.Expenses
-                    .Where(f => f.Date.Year == currentMonth.Year && f.Date.Month == currentMonth.Month)
+                    .Where(f => f.Date.Year == currentMonth.Year && f.Date.Month == currentMonth.Month && f.UserId == userID.ToString())
                     .ToListAsync();
 
                 var totalAmount = monthlyFinances.Sum(f => f.Amount);
@@ -72,13 +95,15 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<decimal>> GetTodayExpensesCount()
+        public async Task<Response<decimal>> GetTodayExpensesCount(string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
                 var dailyExpenses = await _context.Expenses
-                    .Where(f => f.Date == today)
+                    .Where(f => f.Date == today && f.UserId == userID.ToString())
                     .ToListAsync();
 
                 var totalAmount = dailyExpenses.Sum(f => f.Amount);
@@ -91,11 +116,14 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<decimal>> GetAllExpensesCount()
+        public async Task<Response<decimal>> GetAllExpensesCount(string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var allExpenses = await _context.Expenses
+                    .Where(f => f.UserId == userID.ToString())
                     .ToListAsync();
 
                 var totalAmount = allExpenses.Sum(f => f.Amount);
@@ -108,8 +136,10 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<List<CurrentWeekDailyExpenseResponse>>> GetCurrentWeekDailyExpenseCount()
+        public async Task<Response<List<CurrentWeekDailyExpenseResponse>>> GetCurrentWeekDailyExpenseCount(string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -118,7 +148,7 @@ namespace zenra_finance_back.Services
 
                 var weekEnd = weekStart.AddDays(6);
                 var dailyExpenses = await _context.Expenses
-                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date)
                     .Select(g => new CurrentWeekDailyExpenseResponse
                     {
@@ -155,8 +185,10 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<List<MonthExpenseResponse>>> GetExpenseeByYear(int year)
+        public async Task<Response<List<MonthExpenseResponse>>> GetExpenseeByYear(int year, string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var allMonths = Enumerable.Range(1, 12)
@@ -167,7 +199,7 @@ namespace zenra_finance_back.Services
                     });
 
                 var monthlyExpenses = await _context.Expenses
-                    .Where(f => f.Date.Year == year)
+                    .Where(f => f.Date.Year == year && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthExpenseResponse
                     {
@@ -192,8 +224,10 @@ namespace zenra_finance_back.Services
                 return Response<List<MonthExpenseResponse>>.Failure("Failed to retrieve monthly finance count", ex.ToString());
             }
         }
-        public async Task<Response<List<CurrentWeekDailyIncomeExpenseResponse>>> GetCurrentWeekDailyIncomeExpenseCount()
+        public async Task<Response<List<CurrentWeekDailyIncomeExpenseResponse>>> GetCurrentWeekDailyIncomeExpenseCount(string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -203,7 +237,7 @@ namespace zenra_finance_back.Services
 
                 // Get expenses
                 var dailyExpenses = await _context.Expenses
-                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date)
                     .Select(g => new
                     {
@@ -214,7 +248,7 @@ namespace zenra_finance_back.Services
 
                 // Get income (finances)
                 var dailyFinances = await _context.Finances
-                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd)
+                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date)
                     .Select(g => new
                     {
@@ -254,8 +288,10 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<List<MonthIncomeExpenseResponse>>> GetIncomeExpenseeByYear(int year)
+        public async Task<Response<List<MonthIncomeExpenseResponse>>> GetIncomeExpenseeByYear(int year, string accessToken)
         {
+            TokenService tokenService = new TokenService();
+            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
                 var allMonths = Enumerable.Range(1, 12)
@@ -267,7 +303,7 @@ namespace zenra_finance_back.Services
                     });
 
                 var monthlyExpenses = await _context.Expenses
-                    .Where(f => f.Date.Year == year)
+                    .Where(f => f.Date.Year == year && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthIncomeExpenseResponse
                     {
@@ -278,7 +314,7 @@ namespace zenra_finance_back.Services
                     .ToListAsync();
 
                 var monthlyFinances = await _context.Finances
-                    .Where(f => f.Date.Year == year)
+                    .Where(f => f.Date.Year == year && f.UserId == userID.ToString())
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthIncomeExpenseResponse
                     {

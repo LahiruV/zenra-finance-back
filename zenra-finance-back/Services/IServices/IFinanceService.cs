@@ -8,15 +8,16 @@ namespace zenra_finance_back.Services.IServices
 {
     public interface IFinanceService
     {
-        Task<Response<Finance>> AddFinance(Finance finance);
-        Task<Response<List<Finance>>> GetFinance();
-        Task<Response<MonthFinanceResponse>> GetThisMonthlyFinanceCount();
-        Task<Response<MonthFinanceResponse>> GetLastMonthlyFinanceCount();
-        Task<Response<YearFinanceResponse>> GetThisYearFinanceCount();
-        Task<Response<YearFinanceResponse>> GetLastYearFinanceCount();
-        Task<Response<List<MonthFinanceResponse>>> GetFinanceByYear(int year);
-        Task<Response<List<CurrentWeekDailyFinanceResponse>>> GetCurrentWeekDailyFinanceCount();
-        Task<Response<decimal>> GetAllFinancesCount();
+        Task<Response<Finance>> AddFinance(Finance finance, string accessToken);
+        Task<Response<List<Finance>>> GetAllFinance();
+        Task<Response<List<Finance>>> GetFinance(string accessToken);
+        Task<Response<MonthFinanceResponse>> GetThisMonthlyFinanceCount(string accessToken);
+        Task<Response<MonthFinanceResponse>> GetLastMonthlyFinanceCount(string accessToken);
+        Task<Response<YearFinanceResponse>> GetThisYearFinanceCount(string accessToken);
+        Task<Response<YearFinanceResponse>> GetLastYearFinanceCount(string accessToken);
+        Task<Response<List<MonthFinanceResponse>>> GetFinanceByYear(int year, string accessToken);
+        Task<Response<List<CurrentWeekDailyFinanceResponse>>> GetCurrentWeekDailyFinanceCount(string accessToken);
+        Task<Response<decimal>> GetAllFinancesCount(string accessToken);
         Task<Response<Finance>> UpdateFinance(int id, Finance finance);
         Task<Response<Finance>> DeleteFinance(int id);
     }

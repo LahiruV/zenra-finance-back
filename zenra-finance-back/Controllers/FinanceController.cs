@@ -15,6 +15,7 @@ namespace zenra_finance_back.Controllers
     public class FinanceController : ControllerBase
     {
         private readonly IFinanceService _service;
+        private string accessToken => Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         public FinanceController(IFinanceService service)
         {
             _service = service;
@@ -23,22 +24,18 @@ namespace zenra_finance_back.Controllers
         [HttpPost("AddFinance")]
         public async Task<IActionResult> AddFinance([FromBody] Finance finance)
         {
-            if (ModelState.IsValid)
+            var response = await _service.AddFinance(finance, accessToken);
+            if (response.IsSuccess)
             {
-                var response = await _service.AddFinance(finance);
-                if (response.IsSuccess)
-                {
-                    return Ok(response);
-                }
-                return BadRequest(response);
+                return Ok(response);
             }
-            return BadRequest("Some properties are not valid");
+            return BadRequest(response);
         }
 
         [HttpGet("GetFinance")]
         public async Task<IActionResult> GetFinance()
         {
-            var response = await _service.GetFinance();
+            var response = await _service.GetFinance(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -49,7 +46,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetThisMonthlyFinanceCount")]
         public async Task<IActionResult> GetThisMonthlyFinanceCount()
         {
-            var response = await _service.GetThisMonthlyFinanceCount();
+            var response = await _service.GetThisMonthlyFinanceCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -60,7 +57,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetLastMonthlyFinanceCount")]
         public async Task<IActionResult> GetLastMonthlyFinanceCount()
         {
-            var response = await _service.GetLastMonthlyFinanceCount();
+            var response = await _service.GetLastMonthlyFinanceCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -71,7 +68,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetThisYearFinanceCount")]
         public async Task<IActionResult> GetThisYearFinanceCount()
         {
-            var response = await _service.GetThisYearFinanceCount();
+            var response = await _service.GetThisYearFinanceCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -82,7 +79,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetLastYearFinanceCount")]
         public async Task<IActionResult> GetLastYearFinanceCount()
         {
-            var response = await _service.GetLastYearFinanceCount();
+            var response = await _service.GetLastYearFinanceCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -93,7 +90,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetFinanceByYear/{year}")]
         public async Task<IActionResult> GetFinanceByYear(int year)
         {
-            var response = await _service.GetFinanceByYear(year);
+            var response = await _service.GetFinanceByYear(year, accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -104,7 +101,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetCurrentWeekDailyFinanceCount")]
         public async Task<IActionResult> GetCurrentWeekDailyFinanceCount()
         {
-            var response = await _service.GetCurrentWeekDailyFinanceCount();
+            var response = await _service.GetCurrentWeekDailyFinanceCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
@@ -115,7 +112,7 @@ namespace zenra_finance_back.Controllers
         [HttpGet("GetAllFinancesCount")]
         public async Task<IActionResult> GetAllFinancesCount()
         {
-            var response = await _service.GetAllFinancesCount();
+            var response = await _service.GetAllFinancesCount(accessToken);
             if (response.IsSuccess)
             {
                 return Ok(response);
