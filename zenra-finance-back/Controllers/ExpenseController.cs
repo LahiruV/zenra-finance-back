@@ -120,5 +120,27 @@ namespace zenra_finance_back.Controllers
             return BadRequest(response);
         }
 
+        [HttpGet("GetCurrentWeekExpense")]
+        public async Task<IActionResult> GetCurrentWeekExpense()
+        {
+            var response = await _service.GetCurrentWeekExpense(accessToken);
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
+        [HttpGet("GetCurrentMonthWeeklyIncomeExpense")]
+        public async Task<IActionResult> GetCurrentMonthWeeklyIncomeExpense()
+        {
+            var response = await _service.GetCurrentMonthWeeklyIncomeExpense(accessToken);
+            if (response.IsSuccess)
+            {
+                return Ok(response);
+            }
+            return BadRequest(response);
+        }
+
     }
 }

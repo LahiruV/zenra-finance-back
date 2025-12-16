@@ -1,29 +1,40 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[Table("users")] // 👈 match table name exactly
 public class User
 {
+    [Key]
+    [Column("id")] // 👈 THIS fixes your error
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Name is required")]
+    [Required]
+    [Column("name")]
     public string Name { get; set; }
 
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid email format")]
+    [Required]
+    [EmailAddress]
+    [Column("email")]
     public string Email { get; set; }
 
-    public string? Phone { get; set; }  // Nullable and optional
+    [Column("phone")]
+    public string? Phone { get; set; }
 
-    public string? Address { get; set; }  // Nullable and optional
+    [Column("address")]
+    public string? Address { get; set; }
 
-    public string? Nic { get; set; }  // Nullable and optional
+    [Column("nic")]
+    public string? Nic { get; set; }
 
-    [Required(ErrorMessage = "Password is required")]
-    [MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
+    [Required]
+    [MinLength(6)]
+    [Column("password")]
     public string Password { get; set; }
 
-    [Required(ErrorMessage = "Profile is required")]
+    [Required]
+    [Column("profile")]
     public string Profile { get; set; }
 
+    [Column("created_at")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

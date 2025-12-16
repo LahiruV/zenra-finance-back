@@ -23,7 +23,7 @@ namespace zenra_finance_back.Services
         {
             TokenService tokenService = new TokenService();
             var userID = await tokenService.ValidateToken(accessToken);
-            finance.UserId = userID.ToString();
+            finance.UserId = userID;
             try
             {
                 await _context.Finances.AddAsync(finance);
@@ -59,7 +59,7 @@ namespace zenra_finance_back.Services
             {
                 var finances = await _context.Finances
                     .OrderByDescending(f => f.Date)
-                    .Where(f => f.UserId == userID.ToString())
+                    .Where(f => f.UserId == userID)
                     .ToListAsync();
                 return Response<List<Finance>>.Success(finances, "Finances retrieved successfully");
             }
@@ -77,7 +77,7 @@ namespace zenra_finance_back.Services
             {
                 var currentMonth = DateTime.UtcNow;
                 var monthlyFinances = await _context.Finances
-                    .Where(f => f.Date.Year == currentMonth.Year && f.Date.Month == currentMonth.Month && f.UserId == userID.ToString())
+                    .Where(f => f.Date.Year == currentMonth.Year && f.Date.Month == currentMonth.Month && f.UserId == userID)
                     .ToListAsync();
 
                 var totalAmount = monthlyFinances.Sum(f => f.Amount);
@@ -103,7 +103,7 @@ namespace zenra_finance_back.Services
             {
                 var lastMonth = DateTime.UtcNow.AddMonths(-1);
                 var monthlyFinances = await _context.Finances
-                    .Where(f => f.Date.Year == lastMonth.Year && f.Date.Month == lastMonth.Month && f.UserId == userID.ToString())
+                    .Where(f => f.Date.Year == lastMonth.Year && f.Date.Month == lastMonth.Month && f.UserId == userID)
                     .ToListAsync();
 
                 var totalAmount = monthlyFinances.Sum(f => f.Amount);
@@ -129,7 +129,7 @@ namespace zenra_finance_back.Services
             {
                 var currentYear = DateTime.UtcNow.Year;
                 var yearlyFinances = await _context.Finances
-                    .Where(f => f.Date.Year == currentYear && f.UserId == userID.ToString())
+                    .Where(f => f.Date.Year == currentYear && f.UserId == userID)
                     .ToListAsync();
 
                 var totalAmount = yearlyFinances.Sum(f => f.Amount);
@@ -154,7 +154,7 @@ namespace zenra_finance_back.Services
             {
                 var lastYear = DateTime.UtcNow.AddYears(-1).Year;
                 var yearlyFinances = await _context.Finances
-                    .Where(f => f.Date.Year == lastYear && f.UserId == userID.ToString())
+                    .Where(f => f.Date.Year == lastYear && f.UserId == userID)
                     .ToListAsync();
 
                 var totalAmount = yearlyFinances.Sum(f => f.Amount);
@@ -185,7 +185,7 @@ namespace zenra_finance_back.Services
                     });
 
                 var monthlyFinances = await _context.Finances
-                    .Where(f => f.Date.Year == year && f.UserId == userID.ToString())
+                    .Where(f => f.Date.Year == year && f.UserId == userID)
                     .GroupBy(f => f.Date.Month)
                     .Select(g => new MonthFinanceResponse
                     {
@@ -211,54 +211,48 @@ namespace zenra_finance_back.Services
             }
         }
 
-        public async Task<Response<List<CurrentWeekDailyFinanceResponse>>> GetCurrentWeekDailyFinanceCount(string accessToken)
+        public async Task<Response<CurrentWeekFinanceResponse>> GetCurrentWeekDailyFinanceCount(string accessToken)
         {
-            TokenService tokenService = new TokenService();
-            var userID = await tokenService.ValidateToken(accessToken);
             try
             {
+                TokenService tokenService = new TokenService();
+                var userId = await tokenService.ValidateToken(accessToken);
+
+                if (userId <= 0)
+                {
+                    return Response<CurrentWeekFinanceResponse>.Failure("Invalid user token");
+                }
+
                 var today = DateOnly.FromDateTime(DateTime.UtcNow);
                 var daysSinceSunday = (int)today.DayOfWeek;
                 var weekStart = today.AddDays(-daysSinceSunday);
-
                 var weekEnd = weekStart.AddDays(6);
-                var dailyFinances = await _context.Finances
-                    .Where(f => f.Date >= weekStart && f.Date <= weekEnd && f.UserId == userID.ToString())
-                    .GroupBy(f => f.Date)
-                    .Select(g => new CurrentWeekDailyFinanceResponse
+
+                var totalAmount = await _context.Finances
+                    .Where(f =>
+                        f.UserId == userId &&
+                        f.Date >= weekStart &&
+                        f.Date <= weekEnd
+                    )
+                    .SumAsync(f => (decimal?)f.Amount) ?? 0m;
+
+                return Response<CurrentWeekFinanceResponse>.Success(
+                    new CurrentWeekFinanceResponse
                     {
-                        Day = g.Key.ToString("ddd"),
-                        Amount = g.Sum(f => f.Amount)
-                    })
-                    .ToListAsync();
-
-                var result = new List<CurrentWeekDailyFinanceResponse>();
-                for (int i = 0; i < 7; i++)
-                {
-                    var currentDay = weekStart.AddDays(i);
-                    var dayName = currentDay.ToString("ddd");
-                    var existingRecord = dailyFinances.FirstOrDefault(d => d.Day == dayName);
-
-                    result.Add(new CurrentWeekDailyFinanceResponse
-                    {
-                        Day = dayName,
-                        Amount = existingRecord?.Amount ?? 0m
-                    });
-                }
-
-                return Response<List<CurrentWeekDailyFinanceResponse>>.Success(
-                    result,
-                    "Current week daily finance counts retrieved successfully"
+                        Amount = totalAmount
+                    },
+                    "Current week finance total retrieved successfully"
                 );
             }
             catch (Exception ex)
             {
-                return Response<List<CurrentWeekDailyFinanceResponse>>.Failure(
-                    "Failed to retrieve current week daily finance counts",
+                return Response<CurrentWeekFinanceResponse>.Failure(
+                    "Failed to retrieve current week finance total",
                     ex.ToString()
                 );
             }
         }
+
 
         public async Task<Response<decimal>> GetAllFinancesCount(string accessToken)
         {
@@ -267,7 +261,7 @@ namespace zenra_finance_back.Services
             try
             {
                 var allFinances = await _context.Finances
-                    .Where(f => f.UserId == userID.ToString())
+                    .Where(f => f.UserId == userID)
                     .ToListAsync();
 
                 var totalAmount = allFinances.Sum(f => f.Amount);

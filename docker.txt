@@ -1,5 +1,10 @@
 docker build -t zenra-finance-back .
+docker build --no-cache -t zenra-finance-back .
 docker run -d -p 5000:80 --name zenra-finance-container -e "ASPNETCORE_URLS=http://+:80" zenra-finance-back
+docker logout
+docker login
+docker tag zenra-finance-back:latest lahiruv/zenra-finance-back:latest
+docker push lahiruv/zenra-finance-back:latest
 
 
 # Use the official .NET 8 runtime as the base image
